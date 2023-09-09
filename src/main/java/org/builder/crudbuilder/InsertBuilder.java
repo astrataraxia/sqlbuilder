@@ -22,6 +22,9 @@ public class InsertBuilder {
     }
 
     public InsertBuilder columnsAndValues(String table, Map<String, Object> columnValueMap) {
+        if (columnValueMap == null || columnValueMap.isEmpty()) {
+            throw new IllegalArgumentException("Row data cannot be null or empty");
+        }
         appendInsertIntoTable(table);
         String columns = columnsExtraction(columnValueMap);
         parameters.addAll(columnValueMap.values());
@@ -44,6 +47,9 @@ public class InsertBuilder {
     }
 
     public InsertBuilder values(String table, List<Object> values) {
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("Row data cannot be null or empty");
+        }
         appendInsertIntoTable(table);
         parameters.addAll(values);
         query.append(" VALUES (").append(generateValueHolders(values.size())).append(")");

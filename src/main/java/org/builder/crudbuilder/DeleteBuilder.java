@@ -45,7 +45,9 @@ public class DeleteBuilder {
      * @param table The name of the table.
      * @return The current DeleteBuilder instance.
      * @throws IllegalArgumentException If the table name is null or empty.
+     *
      */
+//    DELETE FROM table_name
     public DeleteBuilder deleteFrom(String table) {
         if (!hasText(table)) {
             throw new IllegalArgumentException("Table name cannot be null or empty");
@@ -77,6 +79,10 @@ public class DeleteBuilder {
 
     public DeleteBuilder whereIn(String column, List<Object> values) {
         return addInCondition(column, values);
+    }
+
+    public DeleteBuilder whereNotIn(String column, List<Object> values) {
+        return addNotInCondition(column, values);
     }
 
     public DeleteBuilder whereIsNull(String column) {
@@ -122,6 +128,10 @@ public class DeleteBuilder {
         return addIsNull(column, "IS NOT NULL", "OR");
     }
 
+    public DeleteBuilder orLike(String column, String pattern) {
+        return addCondition("LIKE", column, pattern, "OR");
+    }
+
     public DeleteBuilder andEq(String column, Object condition) {
         return addCondition("=", column, condition, "AND");
     }
@@ -140,6 +150,18 @@ public class DeleteBuilder {
 
     public DeleteBuilder andGte(String column, Object condition) {
         return addCondition(">=", column, condition, "AND");
+    }
+
+    public DeleteBuilder andIsNull(String column) {
+        return addIsNull(column, "IS NULL", "AND");
+    }
+
+    public DeleteBuilder andIsNotNull(String column) {
+        return addIsNull(column, "IS NOT NULL", "AND");
+    }
+
+    public DeleteBuilder andLike(String column, String pattern) {
+        return addCondition("LIKE", column, pattern, "AND");
     }
 
     /**
@@ -237,6 +259,29 @@ public class DeleteBuilder {
         }
         addConditionPrefix("WHERE");
         query.append(column).append(" IN (")
+                .append(values.stream()
+                        .map(value -> {
+                            parameters.add(value);
+                            return "?";
+                        })
+                        .collect(Collectors.joining(", ")))
+                .append(")");
+        return this;
+    }
+
+    /**
+     * Adds an 'NOT IN' condition to the DELETE query.
+     *
+     * @param column The column name for the NOT IN condition.
+     * @param values A list of values for the NOT IN condition.
+     * @return The current DeleteBuilder instance.
+     */
+    private DeleteBuilder addNotInCondition(String column, List<Object> values) {
+        if (!hasText(column) || values == null || values.isEmpty()) {
+            return this;
+        }
+        addConditionPrefix("WHERE");
+        query.append(column).append(" NOT IN (")
                 .append(values.stream()
                         .map(value -> {
                             parameters.add(value);
