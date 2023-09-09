@@ -2,6 +2,8 @@ package org.builder.crudbuilder;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -93,4 +95,100 @@ class UpdateBuilderTest {
         assertThat(builder.getQuery()).isEqualTo("UPDATE products SET price = CASE WHEN category = ? THEN price * ? WHEN category = ? THEN price * ? ELSE ? END");
         assertThat(builder.getParameters()).containsExactly("electronics", 0.9, "apparel", 0.8, "price");
     }
+
+    @Test
+    void testLeftJoin() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .leftJoin("orders", "users.id", "orders.user_id");
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users LEFT JOIN orders ON users.id = orders.user_id");
+    }
+
+    @Test
+    void testRightJoin() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .rightJoin("orders", "users.id", "orders.user_id");
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users RIGHT JOIN orders ON users.id = orders.user_id");
+    }
+
+    @Test
+    void testGt() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereGt("age", 25);
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age > ?");
+        assertThat(builder.getParameters()).containsExactly("age + 1",25);
+    }
+
+    @Test
+    void testLt() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereLt("age", 25);
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age < ?");
+        assertThat(builder.getParameters()).containsExactly("age + 1",25);
+    }
+
+    @Test
+    void testLte() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereLte("age", 25);
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age <= ?");
+        assertThat(builder.getParameters()).containsExactly("age + 1",25);
+    }
+
+    @Test
+    void testWhereIn() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereIn("age", Arrays.asList(25, 26, 27));
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age IN (?, ?, ?)");
+        assertThat(builder.getParameters()).containsExactly("age + 1", 25, 26, 27);
+    }
+
+    @Test
+    void testWhereNotIn() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereNotIn("age", Arrays.asList(25, 26, 27));
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age NOT IN (?, ?, ?)");
+        assertThat(builder.getParameters()).containsExactly("age + 1", 25, 26, 27);
+    }
+
+    @Test
+    void testWhereIsNull() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereIsNull("age");
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age IS NULL");
+        assertThat(builder.getParameters()).containsExactly("age + 1");
+    }
+
+    @Test
+    void testWhereIsNotNull() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereIsNotNull("age");
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age IS NOT NULL");
+        assertThat(builder.getParameters()).containsExactly("age + 1");
+    }
+
+    @Test
+    void testWhereLike() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereLike("name", "John%");
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE name LIKE ?");
+        assertThat(builder.getParameters()).containsExactly("age + 1", "John%");
+    }
+
+    @Test
+    void testWhereBetween() {
+        UpdateBuilder builder = updateQuery().updateTable("users")
+                .setValues(Map.of("age", "age + 1"))
+                .whereBetween("age", 25, 30);
+        assertThat(builder.getQuery()).isEqualTo("UPDATE users SET age = ? WHERE age BETWEEN ? AND ?");
+        assertThat(builder.getParameters()).containsExactly("age + 1", 25, 30);
+    }
+
 }
