@@ -120,7 +120,7 @@ public class UpdateBuilder {
         parameters.add(values);
         return this;
     }
-    public UpdateBuilder lte(String values) {
+    public UpdateBuilder lte(Object values) {
         query.append(" <= ?");
         parameters.add(values);
         return this;
