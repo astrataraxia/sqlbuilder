@@ -21,6 +21,12 @@ I will explain, but it may not be enough. In that case,
 I experimented with various queries on the test code, so take a look. 
 There may be a way to create the query you want.
 
+Common parameter 
+- `getQuery()` : The role of transforming the builder into a string
+- `getParameters()` : List that stores parameters used in Query.
+
+The use of the rest of the builders is written in the examples below or in the test.
+
 ### DeleteBuilder
 
 ```java
@@ -93,5 +99,13 @@ UpdateBuilder builder = updateQuery()
 ### SelectBuilder
 
 ```java
+String query = selectBuilder()
+        .select(List.of("u.username", "o.order_id", "p.product_name"))
+        .from("users u")
+        .join("orders o").on("u.user_id", "o.user_id")
+        .join("products p").on("o.product_id", "p.product_id")
+        .getQuery();
 
+"SELECT (u.username, o.order_id, p.product_name) FROM users u " +
+"JOIN orders o ON u.user_id = o.user_id JOIN products p ON o.product_id = p.product_id");
 ```
