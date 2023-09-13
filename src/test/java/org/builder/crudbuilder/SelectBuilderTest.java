@@ -285,7 +285,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAndLte() {
+    void selectAndLteTest() {
         SelectBuilder builder = selectBuilder().selectFrom("users")
                 .whereEq("age", 15)
                 .andLte("age", 35);
@@ -294,7 +294,7 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAndIsNull() {
+    void selectAndIsNullTest() {
         SelectBuilder builder = selectBuilder().selectFrom("users")
                 .whereEq("age", 15)
                 .andIsNull("age");
@@ -303,11 +303,20 @@ class SelectBuilderTest {
     }
 
     @Test
-    void selectAndIsNotNull() {
+    void selectAndIsNotNullTest() {
         SelectBuilder builder = selectBuilder().selectFrom("users")
                 .whereEq("age", 15)
                 .andIsNotNull("age");
         assertThat(builder.getQuery()).isEqualTo("SELECT * FROM users WHERE age = ? AND age IS NOT NULL");
+        assertThat(builder.getParameters()).containsExactly(15);
+    }
+
+    @Test
+    void selectOrderByTest() {
+        SelectBuilder builder = selectBuilder().selectFrom("users")
+                .whereEq("age", 15)
+                .orderBy("age", OrderType.DESC);
+        assertThat(builder.getQuery()).isEqualTo("SELECT * FROM users WHERE age = ? ORDER BY age DESC");
         assertThat(builder.getParameters()).containsExactly(15);
     }
 

@@ -72,7 +72,7 @@ public class SelectBuilder {
         return this;
     }
 
-    public SelectBuilder orderBy(String column, Object orderType) {
+    public SelectBuilder orderBy(String column, OrderType orderType) {
         query.append(" ORDER BY ").append(column).append(" ").append(orderType);
         return this;
     }
